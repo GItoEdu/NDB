@@ -71,7 +71,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
 
     forms_str = " + ".join(selected_forms)
     ax.set_title(f"【{forms_str}】{target_generic_name}\n選択剤形の総処方数量：{total_count:,.0f}", fontsize=14)
-    ax.legend=(loc='upper right')
+    ax.legend(loc='upper right')
 
     max_val = max(max(male_values, default=0), max(female_values, default=0))
     if max_val > 0:
