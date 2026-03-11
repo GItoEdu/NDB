@@ -45,9 +45,14 @@ def load_and_process_data():
     if '剤形' not in merged_df.columns:
         merged_df['剤形'] = '不明／その他'
 
+    if '薬効分類名称' not in merged_df.columns:
+        merged_df['薬効分類名称'] = '不明／その他'
+    else:
+        merged_df['薬効分類名称'] = merged_df['薬効分類名称'].fillna('不明／その他')
+
     sum_cols = [col for col in merged_df.columns if col == '総計(処方数量)' or str(col).startswith('男_') or str(col).startswith('女_')]
 
-    agg_df = merged_df.groupby(['一般名', '剤形'])[sum_cols].sum().reset_index()
+    agg_df = merged_df.groupby(['薬効分類名称', '一般名', '剤形'])[sum_cols].sum().reset_index()
     agg_df = agg_df.sort_values(by='総計(処方数量)', ascending=False)
 
     return agg_df
@@ -105,13 +110,19 @@ def main():
         return
     
     st.sidebar.header("検索条件")
-    unique_generics = sorted(df['一般名'].dropna().unique())
-    selected_generic = st.sidebar.selectbox("一般名を選択してください", unique_generics)
 
-    generic_df = df[df['一般名'] == selected_generic]
+    unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
+    selected_categories = st.sidebar.selectbox("1. 薬効分類を選択してください", unique_catergories)
+
+    category_df = df[df['薬効分類名称'] == selected_categories]
+
+    unique_generics = sorted(df['一般名'].dropna().unique())
+    selected_generic = st.sidebar.selectbox("2. 一般名を選択してください", unique_generics)
+
+    generic_df = category_df[category_df['一般名'] == selected_generic]
     available_forms = generic_df['剤形'].unique()
 
-    st.sidebar.subheader("剤形を選択")
+    st.sidebar.subheader("3. 剤形を選択")
     selected_forms = []
     for form in available_forms:
         if st.sidebar.checkbox(form, value=True):
