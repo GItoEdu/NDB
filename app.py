@@ -99,7 +99,6 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
 
     ax.set_yticks(y_pos)
     ax.set_yticklabels(age_classes, fontsize=6)
-    ax.set_xticklabels(fontsize=6)
 
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{abs(int(x)):,}"))
 
@@ -129,14 +128,15 @@ def main():
         return
     
     st.sidebar.header("検索条件")
-
+    st.sidebar.subheader("1. 薬効分類を選択")
     unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
-    selected_categories = st.sidebar.selectbox("1. 薬効分類を選択してください", unique_catergories)
+    selected_categories = st.sidebar.selectbox(unique_catergories)
 
     category_df = df[df['薬効分類名称'] == selected_categories]
 
+    st.sidebar.subheader("2. 一般名を選択")
     unique_generics = sorted(category_df['一般名'].dropna().unique())
-    selected_generic = st.sidebar.selectbox("2. 一般名を選択してください", unique_generics)
+    selected_generic = st.sidebar.selectbox(unique_generics)
 
     generic_df = category_df[category_df['一般名'] == selected_generic]
     available_forms = generic_df['剤形'].unique()
