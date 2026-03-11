@@ -152,6 +152,8 @@ def main():
     unique_generics = ["すべて"] + sorted(category_df['一般名'].dropna().unique())
     selected_generic = st.sidebar.selectbox("2. 一般名を選択", unique_generics)
 
+    col_left, col_right = st.columns([1, 3])
+
     if selected_generic == "すべて":
         with col_left:
             st.markdown("#### 処方数量まとめ")
@@ -176,9 +178,7 @@ def main():
             st.info("← 左のメニューから剤形を1つ以上選択してください。")
             return
         
-        filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]
-
-        col_left, col_right = st.columns([1, 3])
+        filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]     
 
         with col_left:
             st.markdown("#### 処方数量まとめ")
