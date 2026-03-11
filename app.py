@@ -27,7 +27,7 @@ def load_and_process_data():
     prescription_df = pd.read_csv(prescription_file)
     master_df = pd.read_csv(master_file)
 
-    merged_df = pd.merge(prescription_df, master_df, on='薬価基準収載医薬品コード', how='left')
+    merged_df = pd.merge(prescription_df, master_df, on='薬価基準収載医薬品コード', how='left', suffixes=('', '_master'))
     merged_df['一般名'] = merged_df['一般名'].fillna(merged_df['医薬品名'])
     if '剤形' not in merged_df.columns:
         merged_df['剤形'] = '不明／その他'
