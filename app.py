@@ -114,7 +114,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
         ax.set_xlim(-max_val * 1.1, max_val * 1.1)
 
     fig.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, width='content')
 
 def main():
     st.set_page_config(page_title="処方データ分析ダッシュボード", layout="wide")
