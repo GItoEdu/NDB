@@ -13,6 +13,7 @@ def load_and_process_data():
     """
     前処理済みの統合処方データとマスタデータを読み込み、集計を行います。
     """
+    # データの読み込み
     prescription_file = 'integrated_prescription_data.csv'
     master_file = 'integrated_drug_master.csv'
 
@@ -24,11 +25,23 @@ def load_and_process_data():
         st.error(f"医薬品マスタ '{master_file}' が見つかりません。")
         return pd.DataFrame()
     
-    prescription_df = pd.read_csv(prescription_file)
-    master_df = pd.read_csv(master_file)
+    prescription_df = pd.read_csv(prescription_file, dtype={'薬価基準収載医薬品コード': str})
+    master_df = pd.read_csv(master_file, dtype={'薬価基準収載医薬品コード': str})
 
+    # 薬価基準収載医薬品コードの整形
+    prescription_df['薬価基準収載医薬品コード'] = prescription_df['薬価基準収載医薬品コード'].str.strip().str.upper()
+    master_df['薬価基準収載医薬品コード'] = master_df['薬価基準収載医薬品コード'].str.strip().str.upper()
+
+    # 医薬品マスタの重複排除
+    master_df = master_df.drop_duplicates(subset=['薬価基準収載医薬品コード'], keep='first')
+
+    # 医薬品マスタと処方データの結合
     merged_df = pd.merge(prescription_df, master_df, on='薬価基準収載医薬品コード', how='left', suffixes=('', '_master'))
-    merged_df['一般名'] = merged_df['一般名'].fillna(merged_df['医薬品名'])
+
+    # 一般名の補完
+    missing_generic = merged_df['一般名'].isna()
+    merged_df.loc[missing_generic, '一般名'] = '※未登録：' + merged_df.loc[missing_generic, '医薬品名']
+
     if '剤形' not in merged_df.columns:
         merged_df['剤形'] = '不明／その他'
 
