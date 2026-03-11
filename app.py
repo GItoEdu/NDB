@@ -91,7 +91,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     female_values = [summed_data.get(f"女_{age}", 0) for age in age_classes]
     male_values_negative = [-val for val in male_values]
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(5, 5))
     y_pos = range(len(age_classes))
 
     ax.barh(y_pos, male_values_negative, color='royalblue', label='男性')
