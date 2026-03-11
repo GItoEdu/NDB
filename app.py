@@ -198,11 +198,19 @@ def main():
 
     st.sidebar.header("検索条件")
 
-    search_query = st.sidebar.text_input("🔍 一般名で検索 (部分一致)")
+    if 'search_query' not in st.session_state:
+        st.session_state.search_query = ""
+
+    def clear_search():
+        st.session_state.search_query = ""
+
+    search_query = st.sidebar.text_input("🔍 一般名で検索 (部分一致)", key="search_query")
     is_category_all = False
     generic_df = pd.DataFrame()
 
     if search_query:
+        st.sidebar.button("✖ 検索をクリアして分類選択に戻る", on_click=clear_search)
+        
         search_results = df[df['一般名'].str.contains(search_query, regex=False, na=False)]
         if search_results.empty:
             st.sidebar.warning("該当する一般名が見つかりませんでした。")
