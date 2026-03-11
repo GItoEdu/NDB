@@ -6,7 +6,7 @@ import japanize_matplotlib
 import os
 
 # 日本語フォント設定
-plt.rcParams['font.family'] = "Gen Jyuu Gothic LP"
+# plt.rcParams['font.family'] = "Gen Jyuu Gothic LP"
 pd.set_option('future.no_silent_downcasting', True)
 
 @st.cache_data
