@@ -91,7 +91,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     female_values = [summed_data.get(f"女_{age}", 0) for age in age_classes]
     male_values_negative = [-val for val in male_values]
 
-    fig, ax = plt.subplots(figsize=(2, 2))
+    fig, ax = plt.subplots(figsize=(4, 4))
     y_pos = range(len(age_classes))
 
     ax.barh(y_pos, male_values_negative, color='royalblue', label='男性')
@@ -154,20 +154,22 @@ def main():
     
     filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]
 
-    st.markdown("### 処方数量まとめ")
-    cols = st.columns(len(selected_forms) + 1)
+    col_left, col_right = st.columns([1, 2])
 
-    total_sum = 0
-    for i, form in enumerate(selected_forms):
-        form_count = filtered_df[filtered_df['剤形'] == form]['総計(処方数量)'].sum()
-        total_sum += form_count
-        cols[i].metric(label=f"💊 {form}", value=f"{form_count:,.0f}")
-    
-    cols[-1].metric(label="📊 選択した剤形の合計", value=f"{total_sum:,.0f}")
-    st.divider()
+    with col_left:
+        st.markdown("#### 処方数量まとめ")
+        total_sum = 0
+        for form in selected_forms:
+            form_count = filtered_df[filtered_df['剤形'] == form]['総計(処方数量)'].sum()
+            total_sum += form_count
+            st.metric(label=f"💊 {form}", value=f"{form_count:,.0f}")
+   
+        st.divider()
+        st.metric(label="📊 選択した剤形の合計", value=f"{total_sum:,.0f}")
 
-    st.markdown("### 男女別・年齢階級別 処方数ピラミッド")
-    plot_combined_pyramid(filtered_df, selected_generic, selected_forms)
+    with col_right:
+        st.markdown("#### 男女別・年齢階級別 処方数ピラミッド")
+        plot_combined_pyramid(filtered_df, selected_generic, selected_forms)
 
 if __name__ == "__main__":
     main()
