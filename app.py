@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import japanize_matplotlib
 import os
 
 # 日本語フォント設定
