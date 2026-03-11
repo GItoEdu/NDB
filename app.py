@@ -21,6 +21,7 @@ def load_japanese_font():
     # ダウンロードしたフォントをMatplotlibに追加して標準設定にする
     fm.fontManager.addfont(font_path)
     plt.rcParams['font.family'] = 'BIZ UDGothic'
+    plt.rcParams['font.size'] = 10
 
 # アプリ起動時にフォントを読み込む
 load_japanese_font()
@@ -90,7 +91,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     female_values = [summed_data.get(f"女_{age}", 0) for age in age_classes]
     male_values_negative = [-val for val in male_values]
 
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=(8, 6))
     y_pos = range(len(age_classes))
 
     ax.barh(y_pos, male_values_negative, color='royalblue', label='男性')
@@ -105,15 +106,15 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     ax.set_ylabel('年齢階級')
 
     forms_str = " + ".join(selected_forms)
-    ax.set_title(f"【{forms_str}】{target_generic_name}\n選択剤形の総処方数量：{total_count:,.0f}", fontsize=14)
-    ax.legend(loc='upper right')
+    ax.set_title(f"【{forms_str}】{target_generic_name}\n選択剤形の総処方数量：{total_count:,.0f}", fontsize=12)
+    ax.legend(loc='upper right', fontsize=9)
 
     max_val = max(max(male_values, default=0), max(female_values, default=0))
     if max_val > 0:
         ax.set_xlim(-max_val * 1.1, max_val * 1.1)
 
     fig.tight_layout()
-    st.pyplot(fig)
+    st.pyplot(fig, use_container_width=True)
 
 def main():
     st.set_page_config(page_title="処方データ分析ダッシュボード", layout="wide")
