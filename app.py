@@ -154,7 +154,7 @@ def main():
     
     filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]
 
-    col_left, col_right = st.columns([1, 2])
+    col_left, col_right = st.columns([1, 3])
 
     with col_left:
         st.markdown("#### 処方数量まとめ")
