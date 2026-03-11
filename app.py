@@ -56,12 +56,46 @@ def load_and_process_data():
     # 医薬品マスタと処方データの結合
     merged_df = pd.merge(prescription_df, master_df, on='薬価基準収載医薬品コード', how='left', suffixes=('', '_master'))
 
-    # 一般名の補完
+    # 販売中止などでマスタにない場合、医薬品名から一般名を抽出
     missing_generic = merged_df['一般名'].isna()
-    merged_df.loc[missing_generic, '一般名'] = '※未登録：' + merged_df.loc[missing_generic, '医薬品名']
+    if missing_generic.any():
+        guessed_names = merged_df.loc[missing_generic, '医薬品名'].copy()
+        # カギ括弧のメーカー名を削除
+        guessed_names = guessed_names.str.replace(r'[「（\(].*?[」）\)]', '', regex=True)
+        # 規格（数字＋単位）以降を削除
+        guessed_names = guessed_names.str.replace(r'[０-９0-9\.．]+(?:ｍｇ|mg|ｇ|g|ｍＬ|mL|μｇ|μg|％|%|万単位|単位|ｍEｑ|mEq|管|瓶|袋|シート|枚).*', '', regex=True)
+        # 残った末尾の剤形を削除
+        guessed_names = guessed_names.str.replace(r'(?:ＯＤ|口腔内崩壊|徐放|腸溶|チュアブル|糖衣|無水)?(?:錠|カプセル|散|顆粒|細粒|ドライシロップ|シロップ|内用液|液|注|静注|筋注|皮下注|軟膏|クリーム|テープ|パッチ|ゲル|ローション|点眼液|点眼剤|点鼻液|点鼻剤|吸入剤|スプレー|キット|シリンジ|ペン|エキス)(?:・|付)?$', '', regex=True)
+        # 抽出した一般名を代入
+        merged_df.loc[missing_generic, '一般名'] = guessed_names.str.strip()
+
+        def extract_form_from_yakkacode(code):
+            code_str = str(code).strip()
+            if len(code_str) >= 8:
+                route_str = code_str[4:7]
+                if route_str.isdigit():
+                    route_num = int(route_str)
+                    form_char = code_str[7].upper()
+                    
+                    if 1 <= route_num <= 399:
+                        if form_char in 'ABCDE': return '内服薬（散・顆粒等）'
+                        if form_char in 'FGHIJKL': return '内服薬（錠剤）'
+                        if form_char in 'MNOP': return '内服薬（カプセル）'
+                        if form_char in 'QRS': return '内服薬（液・シロップ等）'
+                        return '内服薬（その他）'
+                    elif 400 <= route_num <= 699:
+                        return '注射薬'
+                    elif 700 <= route_num <= 999:
+                        return '外用薬'
+            return '不明／その他'
+
+        missing_form = missing_generic & (merged_df['剤形'].isna() | (merged_df['剤形'] == '不明／その他'))
+        merged_df.loc[missing_form, '剤形'] = merged_df.loc[missing_form, '薬価基準収載医薬品コード'].apply(extract_form_from_yakkacode)
 
     if '剤形' not in merged_df.columns:
         merged_df['剤形'] = '不明／その他'
+    else:
+        merged_df['剤形'] = merged_df['剤形'].fillna('不明／その他')
 
     if '薬効分類名称' not in merged_df.columns:
         merged_df['薬効分類名称'] = '不明／その他'
