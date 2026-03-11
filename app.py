@@ -184,8 +184,8 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     st.pyplot(fig, width='content')
 
 def main():
-    st.set_page_config(page_title="処方データ分析ダッシュボード", layout="wide")
-    st.title("処方データ分析ダッシュボード")
+    st.set_page_config(page_title="処方データ分析", layout="wide")
+    st.title("処方データ分析")
 
     st.caption("""第10回NDBオープンデータ（2023年度レセプト情報）の公費レセプトを含むデータから抽出・集計しています。「処方数量」は錠剤などの数量であり、処方回数とは必ずしも一致しません。""")
 
