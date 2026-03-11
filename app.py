@@ -75,6 +75,15 @@ def load_and_process_data():
 
     return agg_df
 
+def format_number(x, pos):
+    abs_x = abs(x)
+    if abs_x >= 100000000:
+        return f"{abs_x / 100000000:.1f}億".replace('.0億', '億')
+    elif abs_x >= 10000:
+        return f"{int(abs_x / 10000):,}万"
+    else:
+        return f"{int(abs_x):,}"
+
 def plot_category_bar_chart(category_df, category_name, top_n=20):
     """指定された薬効分類内の一般名別処方数量を横並び棒グラフで描画します"""
     summed_df = category_df.groupby('一般名')['総計(処方数量)'].sum().reset_index()
@@ -83,7 +92,7 @@ def plot_category_bar_chart(category_df, category_name, top_n=20):
 
     fig, ax = plt.subplots(figsize=(3, 3))
     ax.barh(summed_df['一般名'], summed_df['総計(処方数量)'], color='teal')
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(x):,}"))
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_number))
 
     ax.tick_params(axis='x', labelsize=6)
     ax.tick_params(axis='y', labelsize=6)
@@ -123,7 +132,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     ax.set_yticks(y_pos)
     ax.set_yticklabels(age_classes, fontsize=6)
 
-    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{abs(int(x)):,}"))
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(format_number))
 
     ax.set_xlabel('処方数量', fontsize=6)
     ax.set_ylabel('年齢階級', fontsize=6)
