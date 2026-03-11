@@ -91,7 +91,7 @@ def plot_category_bar_chart(category_df, category_name, top_n=20):
 
     ax.set_title(f"【{category_name}】処方数量トップ{top_n}", fontsize=6)
 
-    current_max = summed_df['合計'].max()
+    current_max = summed_df['総計(処方数量)'].max()
     if pd.notna(current_max) and current_max > 0:
         ax.set_xlim(0, current_max * 1.05)
 
