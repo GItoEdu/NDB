@@ -130,7 +130,7 @@ def main():
     st.sidebar.header("検索条件")
     st.sidebar.subheader("1. 薬効分類を選択")
     unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
-    selected_categories = st.sidebar.selectbox(unique_catergories)
+    selected_categories = st.sidebar.selectbox("", unique_catergories)
 
     category_df = df[df['薬効分類名称'] == selected_categories]
 
