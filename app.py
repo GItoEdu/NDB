@@ -75,7 +75,7 @@ def load_and_process_data():
 
     return agg_df
 
-def plot_category_bar_chart(category_df, category_name, max_x, top_n=20):
+def plot_category_bar_chart(category_df, category_name, top_n=20):
     """指定された薬効分類内の一般名別処方数量を横並び棒グラフで描画します"""
     summed_df = category_df.groupby('一般名')['総計(処方数量)'].sum().reset_index()
     summed_df = summed_df.sort_values('総計(処方数量)', ascending=False).head(top_n)
@@ -88,8 +88,12 @@ def plot_category_bar_chart(category_df, category_name, max_x, top_n=20):
     ax.tick_params(axis='x', labelsize=6)
     ax.tick_params(axis='y', labelsize=6)
     ax.set_xlabel('処方数量', fontsize=6)
+
     ax.set_title(f"【{category_name}】処方数量トップ{top_n}", fontsize=6)
-    ax.set_xlim(0, max_x * 1.05)
+
+    current_max = summed_df['合計'].max()
+    if pd.notna(current_max) and current_max > 0:
+        ax.set_xlim(0, current_max * 1.05)
 
     fig.subplots_adjust(left=0.35, right=0.95, top=0.9, bottom=0.1)
     st.pyplot(fig, width='content')
@@ -145,8 +149,6 @@ def main():
     if df.empty:
         st.warning("データが読み込めませんでした。")
         return
-    
-    global_max_val = df.groupby('一般名')['総計(処方数量)'].sum().max()
 
     st.sidebar.header("検索条件")
 
@@ -167,7 +169,7 @@ def main():
             st.metric(label="📊 分類全体の合計", value=f"{total_sum:,.0f}")
         with col_right:
             st.markdown("#### 医薬品別 処方数量トップ20")
-            plot_category_bar_chart(category_df, selected_category, max_x=global_max_val)
+            plot_category_bar_chart(category_df, selected_category)
     else:
         generic_df = category_df[category_df['一般名'] == selected_generic]
         available_forms = generic_df['剤形'].unique()
