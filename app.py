@@ -198,17 +198,38 @@ def main():
 
     st.sidebar.header("検索条件")
 
-    unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
-    selected_category = st.sidebar.selectbox("1. 薬効分類を選択", unique_catergories)
+    search_query = st.sidebar.text_input("🔍 一般名で検索 (部分一致)")
+    is_category_all = False
+    generic_df = pd.DataFrame()
 
-    category_df = df[df['薬効分類名称'] == selected_category]
+    if search_query:
+        search_results = df[df['一般名'].str.contains(search_query, regex=False, na=False)]
+        if search_results.empty:
+            st.sidebar.warning("該当する一般名が見つかりませんでした。")
+            return
+        
+        unique_search_generics = sorted(search_results['一般名'].unique())
+        selected_generic = st.sidebar.selectbox("検索結果から一般名を選択", unique_search_generics)
 
-    unique_generics = ["すべて"] + sorted(category_df['一般名'].dropna().unique())
-    selected_generic = st.sidebar.selectbox("2. 一般名を選択", unique_generics)
+        generic_df = df[df['一般名'] == selected_generic]
+
+    else:
+        unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
+        selected_category = st.sidebar.selectbox("1. 薬効分類を選択", unique_catergories)
+
+        category_df = df[df['薬効分類名称'] == selected_category]
+
+        unique_generics = ["すべて"] + sorted(category_df['一般名'].dropna().unique())
+        selected_generic = st.sidebar.selectbox("2. 一般名を選択", unique_generics)
+
+        if selected_generic == "すべて":
+            is_category_all = True
+        else:
+            generic_df = category_df[category_df['一般名'] == selected_generic]
 
     col_left, col_right = st.columns([1, 3])
 
-    if selected_generic == "すべて":
+    if is_category_all:
         with col_left:
             st.markdown("#### 処方数量まとめ")
             total_sum = category_df['総計(処方数量)'].sum()
