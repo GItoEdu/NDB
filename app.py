@@ -191,8 +191,6 @@ def main():
         for form in available_forms:
             if st.sidebar.checkbox(form, value=True):
                 selected_forms.append(form)
-        
-        st.subheader(f"■ {selected_generic} の処方状況")
 
         if not selected_forms:
             st.info("← 左のメニューから剤形を1つ以上選択してください。")
