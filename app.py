@@ -157,7 +157,7 @@ def main():
     if selected_generic == "すべて":
         with col_left:
             st.markdown("#### 処方数量まとめ")
-            total_sum = category_df['合計'].sum()
+            total_sum = category_df['総計(処方数量)'].sum()
             st.metric(label="📊 分類全体の合計", value=f"{total_sum:,.0f}")
         with col_right:
             st.markdown("#### 医薬品別 処方数量トップ20")
