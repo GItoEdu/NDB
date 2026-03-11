@@ -209,8 +209,8 @@ def main():
     generic_df = pd.DataFrame()
 
     if search_query:
-        st.sidebar.button("✖ 検索をクリアして分類選択に戻る", on_click=clear_search)
-        
+        st.sidebar.button("検索をクリア", on_click=clear_search)
+
         search_results = df[df['一般名'].str.contains(search_query, regex=False, na=False)]
         if search_results.empty:
             st.sidebar.warning("該当する一般名が見つかりませんでした。")
