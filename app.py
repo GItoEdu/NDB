@@ -84,7 +84,10 @@ def plot_category_bar_chart(category_df, category_name, top_n=20):
     fig, ax = plt.subplots(figsize=(3, 3))
     ax.barh(summed_df['一般名'], summed_df['総計(処方数量)'], color='teal')
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(x):,}"))
-    ax.set_xlabel('処方数量')
+
+    ax.tick_params(axis='x', labelsize=6)
+    ax.tick_params(axis='y', labelsize=6)
+    ax.set_xlabel('処方数量', fontsize=6)
     ax.set_title(f"【{category_name}】処方数量トップ{top_n}", fontsize=6)
 
     fig.tight_layout()
