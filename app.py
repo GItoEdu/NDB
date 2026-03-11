@@ -75,6 +75,21 @@ def load_and_process_data():
 
     return agg_df
 
+def plot_category_bar_chart(category_df, category_name, top_n=20):
+    """指定された薬効分類内の一般名別処方数量を横並び棒グラフで描画します"""
+    summed_df = category_df.groupby('一般名')['総計(処方数量)'].sum().reset_index()
+    summed_df = summed_df.sort_values('総計(処方数量)', ascending=False).head(top_n)
+    summed_df = summed_df.sort_values('総計(処方数量)', ascending=True)
+
+    fig, ax = plt.subplots(figsize=(3, 3))
+    ax.barh(summed_df['一般名'], summed_df['総計(処方数量)'], color='teal')
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(x):,}"))
+    ax.set_xlabel('処方数量')
+    ax.set_title(f"【{category_name}】処方数量トップ{top_n}", fontsize=6)
+
+    fig.tight_layout()
+    st.pyplot(fig, width='content')
+
 def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     """選択された剤形のデータを合算してピラミッドグラフを描画します"""
     summed_data = filtered_df.sum(numeric_only=True)
@@ -130,46 +145,55 @@ def main():
     st.sidebar.header("検索条件")
 
     unique_catergories = sorted(df['薬効分類名称'].dropna().unique())
-    selected_categories = st.sidebar.selectbox("1. 薬効分類を選択", unique_catergories)
+    selected_category = st.sidebar.selectbox("1. 薬効分類を選択", unique_catergories)
 
-    category_df = df[df['薬効分類名称'] == selected_categories]
+    category_df = df[df['薬効分類名称'] == selected_category]
 
-    unique_generics = sorted(category_df['一般名'].dropna().unique())
+    unique_generics = ["すべて"] + sorted(category_df['一般名'].dropna().unique())
     selected_generic = st.sidebar.selectbox("2. 一般名を選択", unique_generics)
 
-    generic_df = category_df[category_df['一般名'] == selected_generic]
-    available_forms = generic_df['剤形'].unique()
+    if selected_generic == "すべて":
+        with col_left:
+            st.markdown("#### 処方数量まとめ")
+            total_sum = category_df['合計'].sum()
+            st.metric(label="📊 分類全体の合計", value=f"{total_sum:,.0f}")
+        with col_right:
+            st.markdown("#### 医薬品別 処方数量トップ20")
+            plot_category_bar_chart(category_df, selected_category)
+    else:
+        generic_df = category_df[category_df['一般名'] == selected_generic]
+        available_forms = generic_df['剤形'].unique()
 
-    st.sidebar.write("3. 剤形を選択")
-    selected_forms = []
-    for form in available_forms:
-        if st.sidebar.checkbox(form, value=True):
-            selected_forms.append(form)
+        st.sidebar.write("3. 剤形を選択")
+        selected_forms = []
+        for form in available_forms:
+            if st.sidebar.checkbox(form, value=True):
+                selected_forms.append(form)
+        
+        st.subheader(f"■ {selected_generic} の処方状況")
+
+        if not selected_forms:
+            st.info("← 左のメニューから剤形を1つ以上選択してください。")
+            return
+        
+        filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]
+
+        col_left, col_right = st.columns([1, 3])
+
+        with col_left:
+            st.markdown("#### 処方数量まとめ")
+            total_sum = 0
+            for form in selected_forms:
+                form_count = filtered_df[filtered_df['剤形'] == form]['総計(処方数量)'].sum()
+                total_sum += form_count
+                st.metric(label=f"💊 {form}", value=f"{form_count:,.0f}")
     
-    st.subheader(f"■ {selected_generic} の処方状況")
+            st.divider()
+            st.metric(label="📊 選択した剤形の合計", value=f"{total_sum:,.0f}")
 
-    if not selected_forms:
-        st.info("← 左のメニューから剤形を1つ以上選択してください。")
-        return
-    
-    filtered_df = generic_df[generic_df['剤形'].isin(selected_forms)]
-
-    col_left, col_right = st.columns([1, 3])
-
-    with col_left:
-        st.markdown("#### 処方数量まとめ")
-        total_sum = 0
-        for form in selected_forms:
-            form_count = filtered_df[filtered_df['剤形'] == form]['総計(処方数量)'].sum()
-            total_sum += form_count
-            st.metric(label=f"💊 {form}", value=f"{form_count:,.0f}")
-   
-        st.divider()
-        st.metric(label="📊 選択した剤形の合計", value=f"{total_sum:,.0f}")
-
-    with col_right:
-        st.markdown("#### 男女別・年齢階級別 処方数ピラミッド")
-        plot_combined_pyramid(filtered_df, selected_generic, selected_forms)
+        with col_right:
+            st.markdown("#### 男女別・年齢階級別 処方数ピラミッド")
+            plot_combined_pyramid(filtered_df, selected_generic, selected_forms)
 
 if __name__ == "__main__":
     main()
