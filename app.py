@@ -92,7 +92,7 @@ def main():
         return
     
     st.sidebar.header("検索条件")
-    unique_generics = df['一般名'].unique()
+    unique_generics = sorted(df['一般名'].dropna().unique())
     selected_generic = st.sidebar.selectbox("一般名を選択してください", unique_generics)
 
     generic_df = df[df['一般名'] == selected_generic]
