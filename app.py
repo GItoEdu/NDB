@@ -116,7 +116,7 @@ def main():
 
     category_df = df[df['薬効分類名称'] == selected_categories]
 
-    unique_generics = sorted(df['一般名'].dropna().unique())
+    unique_generics = sorted(category_df['一般名'].dropna().unique())
     selected_generic = st.sidebar.selectbox("2. 一般名を選択してください", unique_generics)
 
     generic_df = category_df[category_df['一般名'] == selected_generic]
