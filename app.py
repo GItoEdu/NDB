@@ -238,7 +238,6 @@ def main():
             st.markdown("#### 医薬品別 処方数量トップ20")
             plot_category_bar_chart(category_df, selected_category)
     else:
-        generic_df = category_df[category_df['一般名'] == selected_generic]
         available_forms = generic_df['剤形'].unique()
 
         st.sidebar.write("3. 剤形を選択")
