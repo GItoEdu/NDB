@@ -2,12 +2,28 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import japanize_matplotlib
 import os
+import urllib.request
+import matplotlib.font_manager as fm
 
-# 日本語フォント設定
-# plt.rcParams['font.family'] = "Gen Jyuu Gothic LP"
 pd.set_option('future.no_silent_downcasting', True)
+
+@st.cache_resource
+def load_japanese_font():
+    """Google Fontsから日本語フォントをダウンロードし、Matplotlibに設定します"""
+    font_url = 'https://github.com/googlefonts/morisawa-biz-ud-gothic/raw/main/fonts/ttf/BIZUDGothic-Regular.ttf'
+    font_path = 'BIZUDGothic-Regular.ttf'
+    
+    # フォントファイルが存在しない場合のみダウンロード
+    if not os.path.exists(font_path):
+        urllib.request.urlretrieve(font_url, font_path)
+        
+    # ダウンロードしたフォントをMatplotlibに追加して標準設定にする
+    fm.fontManager.addfont(font_path)
+    plt.rcParams['font.family'] = 'BIZ UDGothic'
+
+# アプリ起動時にフォントを読み込む
+load_japanese_font()
 
 @st.cache_data
 def load_and_process_data():
