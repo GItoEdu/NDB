@@ -98,7 +98,7 @@ def plot_combined_pyramid(filtered_df, target_generic_name, selected_forms):
     ax.barh(y_pos, female_values, color='lightcoral', label='女性')
 
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(age_classes)
+    ax.set_yticklabels(age_classes, fontsize=6)
 
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{abs(int(x)):,}"))
 
