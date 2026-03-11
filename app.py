@@ -84,7 +84,7 @@ def format_number(x, pos):
     else:
         return f"{int(abs_x):,}"
 
-def plot_category_bar_chart(category_df, category_name, top_n=20):
+def plot_category_bar_chart(category_df, category_name, top_n=10):
     """指定された薬効分類内の一般名別処方数量を横並び棒グラフで描画します"""
     summed_df = category_df.groupby('一般名')['総計(処方数量)'].sum().reset_index()
     summed_df = summed_df.sort_values('総計(処方数量)', ascending=False).head(top_n)
